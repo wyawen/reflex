@@ -35,7 +35,7 @@ DPDK_MACHINE_FLAGS = -march=native -DRTE_MACHINE_CPUFLAG_SSE -DRTE_MACHINE_CPUFL
 
 INC	= -I. -I../inc $(DPDK_INC)
 CC 	= gcc
-CFLAGS	= -g -Wall -O3 $(INC) $(DPDK_MACHINE_FLAGS)
+CFLAGS	= -fPIC -g -Wall -O3 $(INC) $(DPDK_MACHINE_FLAGS)
 AR	= ar
 
 SRCS	= main.c ixev.c ixev_timer.c

@@ -25,17 +25,17 @@
 
 DPDK	= ../deps/dpdk
 SPDK    = ../deps/spdk
-DPDK_INC = -I$(DPDK)/build/include -I$(DPDK)/lib/librte_eal/common 
+DPDK_INC = -I$(DPDK)/x86_64-native-linuxapp-gcc/include -I$(DPDK)/lib/librte_eal/common
 SPDK_INC = -idirafter$(SPDK)/include
 INC	= -I../inc -I../inc/lwip -I../inc/lwip/ipv4 -I../inc/lwip/ipv6 $(DPDK_INC) $(SPDK_INC) -I../libix
 CC	= gcc
 
 DPDK_MACHINE_FLAGS = -march=native -DRTE_MACHINE_CPUFLAG_SSE -DRTE_MACHINE_CPUFLAG_SSE2 -DRTE_MACHINE_CPUFLAG_SSE3 -DRTE_MACHINE_CPUFLAG_SSSE3 -DRTE_MACHINE_CPUFLAG_SSE4_1 -DRTE_MACHINE_CPUFLAG_SSE4_2 -DRTE_MACHINE_CPUFLAG_AES -DRTE_MACHINE_CPUFLAG_PCLMULQDQ -DRTE_MACHINE_CPUFLAG_AVX -DRTE_MACHINE_CPUFLAG_RDRAND -DRTE_MACHINE_CPUFLAG_FSGSBASE -DRTE_MACHINE_CPUFLAG_F16C -DRTE_MACHINE_CPUFLAG_AVX2
-CFLAGS	= -g -w -fno-dwarf2-cfi-asm -fno-asynchronous-unwind-tables -O3 -mno-red-zone $(INC) $(EXTRA_CFLAGS) -DSPDK_STRING_H $(DPDK_MACHINE_FLAGS)
+CFLAGS	= -fPIC -g -w -fno-dwarf2-cfi-asm -fno-asynchronous-unwind-tables -O3 -mno-red-zone $(INC) $(EXTRA_CFLAGS) -DSPDK_STRING_H $(DPDK_MACHINE_FLAGS) -fPIC
 PCIDMA	= ../deps/pcidma
 INC	+= -I$(PCIDMA)
 LD	= gcc
-LDFLAGS	= -T ix.ld
+LDFLAGS	= -shared -T ix.ld -Wl,-rpath=/home/yawenw/reflex_yawen/reflex/deps/dpdk/x86_64-native-linuxapp-gcc/lib
 LDLIBS	= -lrt -lpthread -lm -lnuma -ldl -lconfig -lpciaccess
 
 ifneq ($(DEBUG),)
@@ -58,7 +58,8 @@ include $(patsubst %, %/dir.mk, $(DIRS))
 %.generated.S: %.c
 	$(CC) $(CFLAGS) -o $@ -S $<
 
-all: ix
+#all: ix
+all: libixenv.so
 
 OBJS=$(subst .c,.o,$(SRCS))
 
@@ -72,12 +73,12 @@ ifneq ($(MAKECMDGOALS),clean)
 endif
 
 DPDK_LIBS=
-DPDK_LIBS+=-Wl,-whole-archive $(DPDK)/build/lib/librte_pmd_ixgbe.a $(DPDK)/build/lib/librte_pmd_ena.a $(DPDK)/build/lib/librte_mempool_ring.a $(DPDK)/build/lib/librte_mempool.a -Wl,-no-whole-archive
-DPDK_LIBS+=$(DPDK)/build/lib/librte_mbuf.a
-DPDK_LIBS+=$(DPDK)/build/lib/librte_ethdev.a
-DPDK_LIBS+=$(DPDK)/build/lib/librte_hash.a
-DPDK_LIBS+=$(DPDK)/build/lib/librte_ring.a
-DPDK_LIBS+=$(DPDK)/build/lib/librte_eal.a
+DPDK_LIB_LIST = rte_pmd_ixgbe rte_pmd_ena rte_ethdev rte_mbuf rte_eal rte_mempool rte_ring rte_mempool_ring  
+DPDK_LIB_EXT = .so
+DPDK_LIB = $(DPDK_LIB_LIST:%=$(DPDK)/x86_64-native-linuxapp-gcc/lib/lib%$(DPDK_LIB_EXT))
+
+DPDK_LIBS+= -Wl,--no-as-needed -Wl,--start-group -Wl,--whole-archive $(DPDK_LIB) -Wl,--end-group -Wl,--no-whole-archive
+
 
 SPDK_LIBS=$(SPDK)/build/lib/libspdk_nvme.a
 SPDK_LIBS+=$(SPDK)/build/lib/libspdk_util.a
@@ -86,8 +87,11 @@ SPDK_LIBS+=$(SPDK)/build/lib/libspdk_log.a
 
 IX_LIBS+=../libix/libix.a
 
-ix: $(DEPENDENCY) $(OBJS) ix.ld
-	$(LD) $(LDFLAGS) -o ix $(OBJS) $(SPDK_LIBS) $(DPDK_LIBS) $(LDLIBS) $(IX_LIBS)
+libixenv.so: $(DEPENDENCY) $(OBJS) ix.ld
+	$(LD) $(LDFLAGS) -o libixenv.so $(OBJS) $(SPDK_LIBS) $(DPDK_LIBS) $(LDLIBS) $(IX_LIBS) 
+
+#ix: $(DEPENDENCY) $(OBJS) ix.ld
+#	$(LD) $(LDFLAGS) -o ix $(OBJS) $(SPDK_LIBS) $(DPDK_LIBS) $(LDLIBS) $(IX_LIBS) 
 clean:
 	rm -f $(OBJS) ix .depend
 
