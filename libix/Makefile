@@ -21,27 +21,21 @@
 
 # A Makefile for libIX.
 
-DPDK	= ../deps/dpdk
+DPDK    = /home/yawenw/reflex_shared_lib/reflex/deps/dpdk
 DPDK_INC = -I$(DPDK)/build/include -I$(DPDK)/lib/librte_eal/common -I$(DPDK)/drivers/net/ixgbe
-DPDK_LIBS=
-#DPDK_LIBS+=-Wl,-whole-archive $(DPDK)/build/lib/librte_pmd_ixgbe.a -Wl,-no-whole-archive
-DPDK_LIBS+=$(DPDK)/build/lib/librte_mbuf.a
-DPDK_LIBS+=$(DPDK)/build/lib/librte_ethdev.a
-DPDK_LIBS+=$(DPDK)/build/lib/librte_mempool.a
-DPDK_LIBS+=$(DPDK)/build/lib/librte_ring.a
-DPDK_LIBS+=$(DPDK)/build/lib/librte_eal.a
 
 DPDK_MACHINE_FLAGS = -march=native -DRTE_MACHINE_CPUFLAG_SSE -DRTE_MACHINE_CPUFLAG_SSE2 -DRTE_MACHINE_CPUFLAG_SSE3 -DRTE_MACHINE_CPUFLAG_SSSE3 -DRTE_MACHINE_CPUFLAG_SSE4_1 -DRTE_MACHINE_CPUFLAG_SSE4_2 -DRTE_MACHINE_CPUFLAG_AES -DRTE_MACHINE_CPUFLAG_PCLMULQDQ -DRTE_MACHINE_CPUFLAG_AVX -DRTE_MACHINE_CPUFLAG_RDRAND -DRTE_MACHINE_CPUFLAG_FSGSBASE -DRTE_MACHINE_CPUFLAG_F16C -DRTE_MACHINE_CPUFLAG_AVX2
 
 INC	= -I. -I../inc $(DPDK_INC)
 CC 	= gcc
-CFLAGS	= -fPIC -g -Wall -O3 $(INC) $(DPDK_MACHINE_FLAGS)
+CFLAGS	= -fPIC -g -Wall -O3 $(INC) $(DPDK_MACHINE_FLAGS) 
 AR	= ar
 
 SRCS	= main.c ixev.c ixev_timer.c
 OBJS	= $(subst .c,.o,$(SRCS))
 
-all: libix.a
+#all: libix.a
+all: libix.so
 
 depend: .depend
 
@@ -51,8 +45,22 @@ depend: .depend
 
 -include .depend
 
-libix.a: $(OBJS)
-	$(AR) cru $(@) $(OBJS) #$(DPDK_LIBS)
+#libix.a: $(OBJS)
+#	$(AR) cru $(@) $(OBJS) #$(DPDK_LIBS)
+
+LD	= gcc
+LDFLAGS = -shared -Wl,-rpath=/home/yawenw/reflex_shared_lib/reflex/deps/dpdk/x86_64-native-linuxapp-gcc/lib
+
+
+DPDK_LIBS=
+DPDK_LIB_LIST = rte_pmd_ixgbe rte_pmd_ena rte_ethdev rte_mbuf rte_eal rte_mempool rte_ring rte_mempool_ring
+DPDK_LIB_EXT = .so
+DPDK_LIB = $(DPDK_LIB_LIST:%=$(DPDK)/x86_64-native-linuxapp-gcc/lib/lib%$(DPDK_LIB_EXT))
+
+DPDK_LIBS+= -Wl,--no-as-needed -Wl,--start-group -Wl,--whole-archive $(DPDK_LIB) -Wl,--end-group -Wl,--no-whole-archive
+
+libix.so: $(OBJS)
+	$(LD) $(LDFLAGS) -o libix.so $(OBJS) $(DPDK_LIBS)
 
 clean:
 	rm -f $(OBJS) libix.a .depend

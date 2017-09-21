@@ -298,6 +298,8 @@ int ethdev_init_cpu(void)
 		exit(0);
 	}
 	percpu_get(tx_buf) = tx_buffer;
+	
+	return 0;
 }
 
 
