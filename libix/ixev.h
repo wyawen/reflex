@@ -217,6 +217,8 @@ extern void ixev_nvme_unregister_flow(long flow_group_id);
 static inline void
 ixev_dial(struct ixev_ctx *ctx, struct ip_tuple *id)
 {
+	printf(">>>debug: in ixev_dial\n");		
+
 	struct bsys_desc *d = __bsys_arr_next(karr);
 	ixev_check_hacks(ctx);
 
@@ -237,3 +239,5 @@ extern int ixev_init_thread(void);
 extern int ixev_init(struct ixev_conn_ops *ops);
 extern int ixev_init_nvme(struct ixev_nvme_ops *ops);
 extern int ixev_init_conn_nvme(struct ixev_conn_ops *conn_ops, struct ixev_nvme_ops *nvme_ops);
+
+extern void helloworld(void);

@@ -78,8 +78,8 @@
 
 #define TRANSITION_TIMEOUT (1 * ONE_MS)
 
-extern const char __perfg_start[];
-extern const char __perfg_end[];
+//extern const char __perfg_start[];
+//extern const char __perfg_end[];
 
 RTE_DEFINE_PER_LCORE(void *, fg_offset);
 
@@ -144,7 +144,8 @@ void eth_fg_init(struct eth_fg *fg, unsigned int idx)
  */
 int eth_fg_init_cpu(struct eth_fg *fg)
 {
-	size_t len = __perfg_end - __perfg_start;
+	//size_t len = __perfg_end - __perfg_start;
+	size_t len = 0;
 	char *addr;
 	addr = rte_zmalloc(NULL, len, 0);
 	if (!addr)
@@ -161,8 +162,8 @@ int eth_fg_init_cpu(struct eth_fg *fg)
  */
 void eth_fg_free(struct eth_fg *fg)
 {
-	size_t len = __perfg_end - __perfg_start;
-
+	//size_t len = __perfg_end - __perfg_start;
+	size_t len = 0;
 	if (fg->perfg)
 		rte_free(fg->perfg);
 }

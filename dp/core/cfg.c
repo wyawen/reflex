@@ -80,7 +80,7 @@
 #include <ix/ethdev.h>
 #include <limits.h>
 
-#define DEFAULT_CONF_FILE "./ix.conf"
+#define DEFAULT_CONF_FILE "/home/yawenw/crail/crail-reflex/reflex/ix.conf"
 
 struct cfg_parameters CFG;
 
@@ -123,8 +123,8 @@ static struct config_vector_t config_tbl[] = {
 	{ "gateway_addr", parse_gateway_addr},
 	{ "arp",          parse_arp},
 	{ "devices",      parse_devices},
-	{ "nvme_devices", parse_nvme_devices},
-	{ "nvme_device_model", parse_nvme_device_model},
+//	{ "nvme_devices", parse_nvme_devices},
+//	{ "nvme_device_model", parse_nvme_device_model},
 	{ "batch",        parse_batch},
 	{ "loader_path",  parse_loader_path},
 	{ "scheduler", 	  parse_scheduler_mode},

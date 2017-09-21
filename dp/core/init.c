@@ -55,6 +55,7 @@
 /*
  * init.c - initialization
  */
+#include <ix/env.h>
 
 #include <sys/socket.h>
 #include <rte_config.h>
@@ -139,11 +140,11 @@ static struct init_vector_t init_tbl[] = {
 	{ "memp",    memp_init,    memp_init_cpu, NULL},
 	{ "tcpapi",  tcp_api_init, tcp_api_init_cpu, NULL},
 	{ "ethdev",  init_ethdev,  ethdev_init_cpu, NULL},
-	{ "nvmemem", init_nvme_request, init_nvme_request_cpu, NULL},
+	//{ "nvmemem", init_nvme_request, init_nvme_request_cpu, NULL},
 	{ "migration", NULL, init_migration_cpu, NULL},
-	{ "nvmedev", init_nvmedev, NULL, NULL},               // before per-cpu init
+	//{ "nvmedev", init_nvmedev, NULL, NULL},               // before per-cpu init
 	{ "hw",      init_hw,      NULL, NULL},               // spaws per-cpu init sequence
-	{ "nvmeqp",  NULL, init_nvmeqp_cpu, NULL},            // after per-cpu init
+	//{ "nvmeqp",  NULL, init_nvmeqp_cpu, NULL},            // after per-cpu init
 	{ "syscall", NULL,         syscall_init_cpu, NULL},
 #ifdef ENABLE_KSTATS
 	{ "kstats",  NULL,         kstats_init_cpu, NULL},    // after timer
@@ -240,7 +241,7 @@ static int init_ethdev(void)
 	dev_conf->fdir_conf.drop_queue = 127;
 	dev_conf->fdir_conf.flex_conf.nb_payloads = 0;
 	dev_conf->fdir_conf.flex_conf.nb_flexmasks = 0;
-
+	
 	for (port_id = 0; port_id < nb_ports; port_id++) {		
 		ret = rte_eth_dev_configure(port_id, nb_rx_q, nb_tx_q, dev_conf);
 		if (ret < 0) {
@@ -300,6 +301,7 @@ static int init_ethdev(void)
 
 	percpu_get(eth_num_queues) = nb_rx_q; //NOTE: assume num tx queues == num rx queues
 	parse_fdir();
+
 	return 0;
 
 err:
@@ -615,6 +617,27 @@ static int init_firstcpu(void)
 
 	return ret;
 }
+
+// called by ixev_init in libix/ixev.c
+int env_init()
+{	
+	int ret, i;
+
+        log_info("init: starting IX\n");
+
+        log_info("init: cpu phase\n");
+        for (i = 0; init_tbl[i].name; i++)
+                if (init_tbl[i].f) {
+                        ret = init_tbl[i].f();
+                        log_info("init: module %-10s %s\n", init_tbl[i].name, (ret ? "FAILURE" : "SUCCESS"));
+                        if (ret)
+                                panic("could not initialize IX\n");
+                }
+	
+	log_info("IX init done\n");
+        return 0;
+} 
+
 
 int main(int argc, char *argv[])
 {

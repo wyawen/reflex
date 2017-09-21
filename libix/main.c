@@ -155,7 +155,7 @@ int ix_init(struct ix_ops *ops, int batch_depth)
 		usys_tbl[USYS_TCP_KNOCK] = (bsysfn_t) ix_default_tcp_knock;
 
 	uarr = sys_baddr();
-	printf("on CPU %d, uarr in ix_init is %p\n", percpu_get(cpu_nr), uarr);
+	//printf("on CPU %d, uarr in ix_init is %p\n", percpu_get(cpu_nr), uarr);
 	if (!uarr){
 		printf("bad uarr\n");
 		return -EFAULT;
