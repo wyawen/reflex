@@ -23,6 +23,7 @@
 #
 # path for this Makefile to work properly.
 
+
 DPDK	= ../deps/dpdk
 SPDK    = ../deps/spdk
 DPDK_INC = -I$(DPDK)/x86_64-native-linuxapp-gcc/include -I$(DPDK)/lib/librte_eal/common
@@ -35,7 +36,8 @@ CFLAGS	= -fPIC -g -w -fno-dwarf2-cfi-asm -fno-asynchronous-unwind-tables -O3 -mn
 PCIDMA	= ../deps/pcidma
 INC	+= -I$(PCIDMA)
 LD	= gcc
-LDFLAGS	= -T ix.ld -Wl,-rpath=/home/yawenw/reflex_shared_lib/reflex/deps/dpdk/x86_64-native-linuxapp-gcc/lib
+LDFLAGS	= -T ix.ld -Wl,-rpath=${CURDIR}/../deps/dpdk/x86_64-native-linuxapp-gcc/lib
+#LDFLAGS	= -T ix.ld -Wl,-rpath=/home/yawenw/reflex_shared_lib/reflex/deps/dpdk/x86_64-native-linuxapp-gcc/lib
 LDLIBS	= -lrt -lpthread -lm -lnuma -ldl -lconfig -lpciaccess
 
 ifneq ($(DEBUG),)
@@ -58,8 +60,7 @@ include $(patsubst %, %/dir.mk, $(DIRS))
 %.generated.S: %.c
 	$(CC) $(CFLAGS) -o $@ -S $<
 
-all: ix
-#all: libixenv.so
+all: libixev.so
 
 OBJS=$(subst .c,.o,$(SRCS))
 
@@ -85,17 +86,15 @@ SPDK_LIBS+=$(SPDK)/build/lib/libspdk_util.a
 SPDK_LIBS+=$(SPDK)/build/lib/libspdk_env_dpdk.a
 SPDK_LIBS+=$(SPDK)/build/lib/libspdk_log.a
 
-#IX_LIBS+=../libix/libix.a
 IX_LIBS+=/home/yawenw/reflex_shared_lib/reflex/libix/libix.so
 
-#libixenv.so: $(DEPENDENCY) $(OBJS) ix.ld
-#	$(LD) $(LDFLAGS) -o libixenv.so $(OBJS) $(SPDK_LIBS) $(DPDK_LIBS) $(LDLIBS) $(IX_LIBS) 
+#shared lib
+libixev.so: $(DEPENDENCY) $(OBJS) ix.ld
+	$(LD) -shared $(LDFLAGS) -o libixev.so $(OBJS) $(SPDK_LIBS) $(DPDK_LIBS) $(LDLIBS) $(IX_LIBS) 
 
-ix: $(DEPENDENCY) $(OBJS) ix.ld
-	$(LD) $(LDFLAGS) -o ix $(OBJS) $(SPDK_LIBS) $(DPDK_LIBS) $(LDLIBS) $(IX_LIBS) 
 
 clean:
-	rm -f $(OBJS) ix .depend
+	rm -f $(OBJS) .depend libixev.so
 
 dist-clean: clean
 	rm *~

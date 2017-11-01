@@ -633,6 +633,8 @@ int env_init()
                         if (ret)
                                 panic("could not initialize IX\n");
                 }
+
+	sleep(20);
 	
 	log_info("IX init done\n");
         return 0;

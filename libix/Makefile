@@ -21,7 +21,7 @@
 
 # A Makefile for libIX.
 
-DPDK    = /home/yawenw/reflex_shared_lib/reflex/deps/dpdk
+DPDK    = ../deps/dpdk
 DPDK_INC = -I$(DPDK)/build/include -I$(DPDK)/lib/librte_eal/common -I$(DPDK)/drivers/net/ixgbe
 
 DPDK_MACHINE_FLAGS = -march=native -DRTE_MACHINE_CPUFLAG_SSE -DRTE_MACHINE_CPUFLAG_SSE2 -DRTE_MACHINE_CPUFLAG_SSE3 -DRTE_MACHINE_CPUFLAG_SSSE3 -DRTE_MACHINE_CPUFLAG_SSE4_1 -DRTE_MACHINE_CPUFLAG_SSE4_2 -DRTE_MACHINE_CPUFLAG_AES -DRTE_MACHINE_CPUFLAG_PCLMULQDQ -DRTE_MACHINE_CPUFLAG_AVX -DRTE_MACHINE_CPUFLAG_RDRAND -DRTE_MACHINE_CPUFLAG_FSGSBASE -DRTE_MACHINE_CPUFLAG_F16C -DRTE_MACHINE_CPUFLAG_AVX2
@@ -34,7 +34,6 @@ AR	= ar
 SRCS	= main.c ixev.c ixev_timer.c
 OBJS	= $(subst .c,.o,$(SRCS))
 
-#all: libix.a
 all: libix.so
 
 depend: .depend
@@ -44,9 +43,6 @@ depend: .depend
 	$(foreach SRC,$(SRCS),$(CC) $(CFLAGS) -MM -MT $(SRC:.c=.o) $(SRC) >> .depend;)
 
 -include .depend
-
-#libix.a: $(OBJS)
-#	$(AR) cru $(@) $(OBJS) #$(DPDK_LIBS)
 
 LD	= gcc
 LDFLAGS = -shared -Wl,-rpath=/home/yawenw/reflex_shared_lib/reflex/deps/dpdk/x86_64-native-linuxapp-gcc/lib

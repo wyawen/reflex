@@ -80,7 +80,8 @@
 #include <ix/ethdev.h>
 #include <limits.h>
 
-#define DEFAULT_CONF_FILE "/home/yawenw/crail/crail-reflex/reflex/ix.conf"
+#define DEFAULT_CONF_FILE "/home/yawenw/reflex_shared_lib/reflex/ix.conf"
+
 
 struct cfg_parameters CFG;
 
