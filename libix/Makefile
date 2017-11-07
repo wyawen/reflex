@@ -21,6 +21,7 @@
 
 # A Makefile for libIX.
 
+REFLEX  = ${CURDIR}/..
 DPDK    = ../deps/dpdk
 DPDK_INC = -I$(DPDK)/build/include -I$(DPDK)/lib/librte_eal/common -I$(DPDK)/drivers/net/ixgbe
 
@@ -45,8 +46,7 @@ depend: .depend
 -include .depend
 
 LD	= gcc
-LDFLAGS = -shared -Wl,-rpath=/home/yawenw/reflex_shared_lib/reflex/deps/dpdk/x86_64-native-linuxapp-gcc/lib
-
+LDFLAGS = -shared -Wl,-rpath=$(REFLEX)/deps/dpdk/x86_64-native-linuxapp-gcc/lib
 
 DPDK_LIBS=
 DPDK_LIB_LIST = rte_pmd_ixgbe rte_pmd_ena rte_ethdev rte_mbuf rte_eal rte_mempool rte_ring rte_mempool_ring

@@ -23,7 +23,7 @@
 #
 # path for this Makefile to work properly.
 
-
+REFLEX  = ${CURDIR}/..
 DPDK	= ../deps/dpdk
 SPDK    = ../deps/spdk
 DPDK_INC = -I$(DPDK)/x86_64-native-linuxapp-gcc/include -I$(DPDK)/lib/librte_eal/common
@@ -36,8 +36,7 @@ CFLAGS	= -fPIC -g -w -fno-dwarf2-cfi-asm -fno-asynchronous-unwind-tables -O3 -mn
 PCIDMA	= ../deps/pcidma
 INC	+= -I$(PCIDMA)
 LD	= gcc
-LDFLAGS	= -T ix.ld -Wl,-rpath=${CURDIR}/../deps/dpdk/x86_64-native-linuxapp-gcc/lib
-#LDFLAGS	= -T ix.ld -Wl,-rpath=/home/yawenw/reflex_shared_lib/reflex/deps/dpdk/x86_64-native-linuxapp-gcc/lib
+LDFLAGS	= -T ix.ld -Wl,-rpath=$(REFLEX)/deps/dpdk/x86_64-native-linuxapp-gcc/lib
 LDLIBS	= -lrt -lpthread -lm -lnuma -ldl -lconfig -lpciaccess
 
 ifneq ($(DEBUG),)
@@ -86,7 +85,7 @@ SPDK_LIBS+=$(SPDK)/build/lib/libspdk_util.a
 SPDK_LIBS+=$(SPDK)/build/lib/libspdk_env_dpdk.a
 SPDK_LIBS+=$(SPDK)/build/lib/libspdk_log.a
 
-IX_LIBS+=/home/yawenw/reflex_shared_lib/reflex/libix/libix.so
+IX_LIBS+=$(REFLEX)/libix/libix.so
 
 #shared lib
 libixev.so: $(DEPENDENCY) $(OBJS) ix.ld
