@@ -358,12 +358,18 @@ static void receive_req(struct pp_conn *conn)
 			}
 
 			unsigned long t = (rdtsc() - t0)/cycles_per_us; 
+
 			if (!SWEEP && qdepth) {
 				printf("======================================\n");
-				printf("num_req=%d, IOPS=%lu, duration=%d in us\n", measure, measure*usecs/t, t);
+				printf("req_received = %d, req_sent = %d\n", measure, sent);
+				unsigned long iops =  measure*usecs/t; 
+				printf("IOPS = %lu\n", iops);
+				int io_size_bytes = req_size*ns_sector_size;
+				printf("Throughput = %lu Mb/s\n", 1.0*iops*io_size_bytes*8/1000000);
 				printf("======================================\n");
-			} else {			
-				printf("%lu\t %lu\t %lu\t %lu\t %lu\t %lu\t %lu\t %lu\t %lu\t %lu\t %lu\t %lu\t %lu\t %lu\t %lu\t %lu\n",
+			}			
+			
+			printf("%lu\t %lu\t %lu\t %lu\t %lu\t %lu\t %lu\t %lu\t %lu\t %lu\t %lu\t %lu\t %lu\t %lu\t %lu\t %lu\n",
 						       target_IOPS,
 						       nr_threads * (NUM_MEASURE * usecs) / ((rdtsc() - phase_start) / cycles_per_us),
 						       avg/num_measured_reads, 
@@ -379,7 +385,7 @@ static void receive_req(struct pp_conn *conn)
 						       get_percentile(measurements, num_measured_reads, 95),
 						       get_percentile(measurements, num_measured_reads, 99),
 						       max, missed_sends);
-			}
+		
 		
 			run++;
 		}
