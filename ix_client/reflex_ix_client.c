@@ -365,7 +365,7 @@ static void receive_req(struct pp_conn *conn)
 				unsigned long iops =  measure*usecs/t; 
 				printf("IOPS = %lu\n", iops);
 				int io_size_bytes = req_size*ns_sector_size;
-				printf("Throughput = %lu Mb/s\n", 1.0*iops*io_size_bytes*8/1000000);
+				printf("Throughput = %lu Mb/s\n", iops*io_size_bytes*8/1000000);
 				printf("======================================\n");
 			}			
 			
